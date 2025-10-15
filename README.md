@@ -4,8 +4,6 @@ Add to dhcpd.conf:
 on commit {
     set clip = binary-to-ascii(10, 8, ".", leased-address);
 
-    #set clhw = binary-to-ascii(16, 8, ":", substring(hardware, 1, 6));
-
     set clhw = concat(
         suffix(concat("0",binary-to-ascii(16,8,"", substring(hardware,1,1))),2),":",
         suffix(concat("0",binary-to-ascii(16,8,"", substring(hardware,2,1))),2),":",
@@ -19,7 +17,8 @@ on commit {
         host-decl-name,
         option fqdn.hostname,
         option host-name,
-        "none");
+        "none"
+    );
 
     execute("/etc/sh_cmd/ip_usage_stat/dhcpd_eventlog.py", clip, clhw, ClientHost);
 
