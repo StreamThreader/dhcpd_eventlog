@@ -3,13 +3,29 @@ Add to dhcpd.conf:
 # Write logfile
 on commit {
     set clip = binary-to-ascii(10, 8, ".", leased-address);
-    set clhw = binary-to-ascii(16, 8, ":", substring(hardware, 1, 6));
+
+    #set clhw = binary-to-ascii(16, 8, ":", substring(hardware, 1, 6));
+
+    set clhw = concat(
+        suffix(concat("0",binary-to-ascii(16,8,"", substring(hardware,1,1))),2),":",
+        suffix(concat("0",binary-to-ascii(16,8,"", substring(hardware,2,1))),2),":",
+        suffix(concat("0",binary-to-ascii(16,8,"", substring(hardware,3,1))),2),":",
+        suffix(concat("0",binary-to-ascii(16,8,"", substring(hardware,4,1))),2),":",
+        suffix(concat("0",binary-to-ascii(16,8,"", substring(hardware,5,1))),2),":",
+        suffix(concat("0",binary-to-ascii(16,8,"", substring(hardware,6,1))),2)
+    );
+
     set ClientHost = pick-first-value(
         host-decl-name,
         option fqdn.hostname,
         option host-name,
         "none");
-    execute("/etc/sh_cmd/dhcpd_eventlog.py", clip, clhw, ClientHost);
+
+    execute("/etc/sh_cmd/ip_usage_stat/dhcpd_eventlog.py", clip, clhw, ClientHost);
+
+    unset clip;
+    unset clhw;
+    unset ClientHost;
 }
 ```
 
